@@ -46,7 +46,8 @@
 
 \maketitle
 
-The code of this project can be found \href{https://github.com/leonarddls/NLP_projet}{HERE} : \begin{verbatim} https://github.com/leonarddls/NLP_projet \end{verbatim}
+The code of this project can be found \href{https://github.com/leonarddls/NLP_projet}{HERE} : \texttt{https://github.com/leonarddls/NLP\_projet}
+
 
 
 \section{Problem Presentation}
@@ -103,20 +104,23 @@ AUC-ROC is also designed for classification problem, and also use the false posi
 
 The main difference between the two is that the F1 score takes predicted classes as an input, and AUC-ROC predicted scores (or probability). So when we want to evaluate a model like a neural network, which can output probabilities, AUC is a better option, since F1-score would require that we set a threshold to actually classify data.
 
-Our first method will be a T\textbf{F-IDF associated with a Decision Tree classifier}, which is a basic method that will give us some standard score to evaluate the others. Then we will train and use a \textbf{LSTM} neural network. Then, a \textbf{BERT} model.
+Our first method will be a T\textbf{F-IDF associated with simple classifiers like a Decision Tree and a Linear SVC}, which is a basic method that will give us some standard score to evaluate the others. Then we will train and use a \textbf{LSTM} neural network. Then, a \textbf{BERT} model.
 
 \section{The Three methods}
 
-\subsection{TF-IDF and Decision Tree}
+\subsection{TF-IDF and simple classifiers : Decision Tree and Linear SVC}
 
 \subsubsection{About TF-IDF}
+
 TF-IDF stands for Text Frequency - Inverse Document Frequency. It is a very basic way to have an idea of the "importance" of each word in a text, by just computing its frequency, that is to say the number of occurrences divided by the text length, and compare it to the frequency in the whole document (i.e. in other texts).
 
-We then use a Decision Tree on the output of the TF-IDF to classify a text and already have a small classifier.
+
 
 \subsubsection{Our work}
 
-TODO: Leonard ?
+We use a Decision Tree and a Linear SVC Classifier on the output of the TF-IDF to classify a comment and already have small classifiers.
+
+The idea of those network is to have an idea of what a basic network would be capable of in order to better appreciate the good result we expect from our previous models.
 
 \subsection{LSTM}
 
@@ -128,7 +132,15 @@ Since we learned in class how an LSTM work, we will not give more details and di
 
 \subsubsection{Our work}
 
-TODO : Leonard ?
+We used a Embedder that takes 250 words long tokenized sentences and embeds each word in 128 dimensions. Each embedded sentence is then passed to an LSTM layercells with 60 hidden units. The output of the LSTM is in turn fed into 2 dense layers of 50 and 6 neurons. The last layers of 6 neurons uses sigmoid function and correspond to the probability of a sentence to be of a given category. (see Figure \ref{fig:sumlstm})
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{img/summary LSTM.PNG}
+    \caption{Keras summary of our LSTM based network}
+    \label{fig:sumlstm}
+\end{figure}
+
 
 \subsection{BERT}
 
@@ -160,7 +172,7 @@ This separation in tasks is useful. The encoder learns what the source language 
 
 BERT stands for a Bidirectional Encoder Representation from Transformers. BERT can be used for translation, as well as text summarization or, what is important to us, sentiment analysis. 
 
-\begin{figure}[]
+\begin{figure}[H]
     \centering
     \includegraphics[height=10cm]{img/Transformer.PNG}
     \caption{Schema of a Transformer from the original paper of Vaswani et al.\cite{vaswani2017attention}}
@@ -169,7 +181,16 @@ BERT stands for a Bidirectional Encoder Representation from Transformers. BERT c
 
 \subsubsection{Our work}
 
-TODO : Leonard ?
+Our network take 250 length of padded or shortened tokenized sentenced ans feeds then to a transformer layer. We used a pretrained small size BERT model called \textit{DistilBERT} which has about $66$ million parameters (vs $110$ milion in full-sized BERT). The outputs of DistilBERT are fed into 3 dense layers of 256, 64 and 6 neurons each. The last layers of 6 neurons uses sigmoid function and corresponds to the probability of a sentence to be of a given category. (see Figure \ref{fig:sumtrans})
+
+The transformer layer is set to non trainable, only the dense layers are trained. However, because of the size of DistilBERT, the training takes a lot of time, mainly because the forward pass is very computationally intensive.
+
+\begin{figure}[]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/summary transformer.PNG}
+    \caption{Keras summary of our transformers based network}
+    \label{fig:sumtrans}
+\end{figure}
 
 \section{Results}
 
@@ -179,9 +200,9 @@ TODO : Leonard ?
 \begin{tabular}{| r | c |}
 \hline
 Method & AUC (validation data) \\ \hline \hline
-Decision tree & 0 \\ \hline
-LSTM & 0.9809 \\ \hline
-BERT & 0.9828 \\ \hline
+Decision tree & 0.81 \\ \hline
+LSTM & 0.981 \\ \hline
+BERT & 0.983 \\ \hline
 \end{tabular}
 \end{center}
 \caption{\label{tab:result-table}Results obtained on validation data for each method.}
